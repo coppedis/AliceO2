@@ -57,7 +57,14 @@ class Hit : public o2::BasicXYZEHit<Float_t, Float_t>
   float getPMCLightYield() const { return mNphePMC; }
   float getPMQLightYield() const { return mNphePMQ; }
   int getNumContributingSteps() const { return mNoContributingSteps; }
-
+  float getPrimaryEnergy() const { return mPrimaryEnergy; }
+  float GetX() const { return mXImpact.X(); }
+  float GetY() const { return mXImpact.Y(); }
+  float GetZ() const { return mXImpact.Z(); }
+  float GetPx() const { return mMomentum.X(); }
+  float GetPy() const { return mMomentum.Y(); }
+  float GetPz() const { return mMomentum.Z(); }
+  
  private:
   Int_t mParentID;
   Bool_t mSecFlag;
