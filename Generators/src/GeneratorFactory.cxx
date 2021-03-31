@@ -110,8 +110,8 @@ void GeneratorFactory::setPrimaryGenerator(o2::conf::SimConfig const& conf, Fair
   } else if (genconfig.compare("zdcgen") == 0) {
     // a simple "box" generator for forward neutrons
     LOG(INFO) << "Init box forward/backward zdc generator";
-    auto boxGenC = makeBoxGen(2112 /*neutrons*/, 1, -8, -9999, 500, 1000, 0., 360.);
-    auto boxGenA = makeBoxGen(2112 /*neutrons*/, 1, 8, 9999, 500, 1000, 0., 360.);
+    auto boxGenC = makeBoxGen(2112 /*neutrons*/, 1, -8, -9999, 2200, 2700, 0., 360.);
+    auto boxGenA = makeBoxGen(2112 /*neutrons*/, 1, 8, 9999, 2200, 2700, 0., 360.);
     primGen->AddGenerator(boxGenC);
     primGen->AddGenerator(boxGenA);
   } else if (genconfig.compare("emcgenele") == 0) {
