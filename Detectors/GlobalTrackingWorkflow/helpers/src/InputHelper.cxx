@@ -20,11 +20,12 @@
 #include "GlobalTrackingWorkflowReaders/TrackTPCITSReaderSpec.h"
 #include "GlobalTrackingWorkflowReaders/PrimaryVertexReaderSpec.h"
 #include "GlobalTrackingWorkflowReaders/SecondaryVertexReaderSpec.h"
+#include "GlobalTrackingWorkflowReaders/TrackCosmicsReaderSpec.h"
 #include "TOFWorkflowUtils/ClusterReaderSpec.h"
 #include "TOFWorkflow/TOFMatchedReaderSpec.h"
 #include "FT0Workflow/RecPointReaderSpec.h"
 #include "TRDWorkflowIO/TRDTrackletReaderSpec.h"
-#include "TRDWorkflow/TRDTrackReaderSpec.h"
+#include "TRDWorkflowIO/TRDTrackReaderSpec.h"
 
 using namespace o2::framework;
 using namespace o2::globaltracking;
@@ -104,5 +105,15 @@ int InputHelper::addInputSpecsSVertex(const o2::framework::ConfigContext& config
     return 0;
   }
   specs.emplace_back(o2::vertexing::getSecondaryVertexReaderSpec());
+  return 0;
+}
+
+// attach cosmic tracks reader
+int InputHelper::addInputSpecsCosmics(const o2::framework::ConfigContext& configcontext, o2::framework::WorkflowSpec& specs, bool mc)
+{
+  if (configcontext.options().get<bool>("disable-root-input")) {
+    return 0;
+  }
+  specs.emplace_back(o2::globaltracking::getTrackCosmicsReaderSpec(mc));
   return 0;
 }

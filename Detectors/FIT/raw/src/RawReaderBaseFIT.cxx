@@ -8,10 +8,5 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-#ifdef __CLING__
-
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
-
-#endif
+#include "FITRaw/RawReaderBaseFIT.h"
+using namespace o2::fit;

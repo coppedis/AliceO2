@@ -8,16 +8,24 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-#ifdef __CLING__
+#include "Framework/DriverClient.h"
+#include <regex>
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+namespace o2::framework
+{
 
-#pragma link C++ class o2::ft0::DataBlockPM + ;
-#pragma link C++ class o2::ft0::DataBlockTCM + ;
-#pragma link C++ class o2::ft0::DataBlockTCMext + ;
-#pragma link C++ class o2::ft0::DigitBlockFT0 + ;
-#pragma link C++ class o2::ft0::DigitBlockFT0ext + ;
+void DriverClient::observe(const char* eventPrefix, std::function<void(std::string_view)> callback)
+{
+  mEventMatchers.push_back({eventPrefix, callback});
+}
 
-#endif
+void DriverClient::dispatch(std::string_view event)
+{
+  for (auto& handle : mEventMatchers) {
+    if (event.rfind(handle.prefix, 0) == 0) {
+      handle.callback(event);
+    }
+  }
+}
+
+} // namespace o2::framework
