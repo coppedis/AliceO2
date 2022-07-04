@@ -82,10 +82,12 @@ void EventManager::displayCurrentEvent()
 
     for (int i = 0; i < EVisualisationDataType::NdataTypes; ++i) {
       dataTypeLists[i] = new TEveElementList(gDataTypeNames[i].c_str());
+      dataTypeListsPhi[i] = new TEveElementList(gDataTypeNames[i].c_str());
     }
 
     VisualisationEvent event; // collect calorimeters in one drawing step
     auto displayList = dataSource->getVisualisationList(no, EventManagerFrame::getInstance().getMinTimeFrameSliderValue(), EventManagerFrame::getInstance().getMaxTimeFrameSliderValue(), EventManagerFrame::MaxRange);
+
     for (auto it = displayList.begin(); it != displayList.end(); ++it) {
       if (it->second == EVisualisationGroup::EMC || it->second == EVisualisationGroup::PHS) {
         displayCalorimeters(it->first, gVisualisationGroupName[it->second]);
@@ -93,10 +95,7 @@ void EventManager::displayCurrentEvent()
         displayVisualisationEvent(it->first, gVisualisationGroupName[it->second]);
       }
     }
-
-    for (int i = 0; i < EVisualisationDataType::NdataTypes; ++i) {
-      multiView->registerElement(dataTypeLists[i]);
-    }
+    multiView->registerElements(dataTypeLists, dataTypeListsPhi);
 
     if (vizSettings.firstEvent) {
       saveVisualisationSettings();
@@ -104,8 +103,12 @@ void EventManager::displayCurrentEvent()
     } else {
       restoreVisualisationSettings();
     }
-
-    multiView->getAnnotationTop()->SetText(TString::Format("Run %d\n%s", dataSource->getRunNumber(), dataSource->getCollisionTime().c_str()));
+    if (this->mShowDate) {
+      multiView->getAnnotationTop()->SetText(
+        TString::Format("Run %d\n%s", dataSource->getRunNumber(), dataSource->getCollisionTime().c_str()));
+    } else {
+      multiView->getAnnotationTop()->SetText(TString::Format("Run %d", dataSource->getRunNumber()));
+    }
     auto detectors = detectors::DetID::getNames(dataSource->getDetectorsMask());
     multiView->getAnnotationBottom()->SetText(TString::Format("TFOrbit: %d\nDetectors: %s", dataSource->getFirstTForbit(), detectors.c_str()));
   }
@@ -233,6 +236,10 @@ void EventManager::displayVisualisationEvent(VisualisationEvent& event, const st
 
   if (trackCount != 0) {
     dataTypeLists[EVisualisationDataType::Tracks]->AddElement(list);
+    if (detectorName != "MCH" && detectorName != "MFT" && detectorName != "MID") {
+      // LOG(info) << "phi: " << trackCount << " detector: " << detectorName;
+      dataTypeListsPhi[EVisualisationDataType::Tracks]->AddElement(list);
+    }
   }
 
   // global clusters (with no connection information)
@@ -246,6 +253,10 @@ void EventManager::displayVisualisationEvent(VisualisationEvent& event, const st
 
   if (clusterCount != 0) {
     dataTypeLists[EVisualisationDataType::Clusters]->AddElement(point_list);
+    if (detectorName != "MCH" && detectorName != "MFT" && detectorName != "MID") {
+      // LOG(info) << "phi: " << clusterCount << " detector: " << detectorName;
+      dataTypeListsPhi[EVisualisationDataType::Clusters]->AddElement(point_list);
+    }
   }
 
   LOG(info) << "tracks: " << trackCount << " detector: " << detectorName << ":" << dataTypeLists[EVisualisationDataType::Tracks]->NumChildren();
@@ -302,6 +313,14 @@ void EventManager::displayCalorimeters(VisualisationEvent& event, const std::str
       data->FillSlice(0, info.scale * calo.getEnergy());
     }
 
+    // remove artefacts
+    data->AddTower(-0.5, 0.5, -1.574 - 0.1, -1.574 + 0.1);
+    data->AddTower(-0.5, 0.5, 1.574 - 0.1, 1.574 + 0.1);
+    data->AddTower(-0.5, 0.5, -0.593 - 0.1, -0.593 + 0.1);
+    data->AddTower(-0.5, 0.5, -0.726 - 0.1, -0.726 + 0.1);
+    data->AddTower(-0.5, 0.5, -3.028 - 0.1, -3.028 + 0.1);
+    data->AddTower(-0.5, 0.5, -1.915 - 0.1, -1.915 + 0.1);
+
     data->DataChanged();
     data->SetAxisFromBins();
 
@@ -313,6 +332,7 @@ void EventManager::displayCalorimeters(VisualisationEvent& event, const std::str
     calo3d->SetRnrFrame(false, false); // do not draw barrel grid
 
     dataTypeLists[EVisualisationDataType::Calorimeters]->AddElement(calo3d);
+    dataTypeListsPhi[EVisualisationDataType::Calorimeters]->AddElement(calo3d);
   }
 }
 
