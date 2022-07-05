@@ -30,7 +30,7 @@ WorkflowSpec defineDataProcessing(ConfigContext const& configcontext)
   auto useCCDB = configcontext.options().get<bool>("use-ccdb");
   auto doLHCcalib = configcontext.options().get<bool>("do-lhc-phase");
 
-  LOG(INFO) << "ZDC Calibration workflow: options";
-  LOG(INFO) << "useCCDB = " << useCCDB;
+  LOG(info) << "ZDC Calibration workflow: options";
+  LOG(info) << "useCCDB = " << useCCDB;
   return specs;
 }
