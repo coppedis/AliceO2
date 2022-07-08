@@ -30,10 +30,10 @@ ClassImp(o2::zdc::ZDCDCSinfo);
 
 void ZDCDCSinfo::print() const
 {
-  LOG(INFO) << "First Value: timestamp = " << firstValue.first << ", value = " << firstValue.second;
-  LOG(INFO) << "Last Value:  timestamp = " << lastValue.first << ", value = " << lastValue.second;
-  LOG(INFO) << "Mid Value:   timestamp = " << midValue.first << ", value = " << midValue.second;
-  LOG(INFO) << "Max Change:  timestamp = " << maxChange.first << ", value = " << maxChange.second;
+  LOG(info) << "First Value: timestamp = " << firstValue.first << ", value = " << firstValue.second;
+  LOG(info) << "Last Value:  timestamp = " << lastValue.first << ", value = " << lastValue.second;
+  LOG(info) << "Mid Value:   timestamp = " << midValue.first << ", value = " << midValue.second;
+  LOG(info) << "Max Change:  timestamp = " << maxChange.first << ", value = " << maxChange.second;
 }
 
 //__________________________________________________________________
@@ -62,7 +62,7 @@ int ZDCDCSProcessor::process(const gsl::span<const DPCOM> dps)
 
   // first we check which DPs are missing
   if (mVerbose) {
-    LOG(INFO) << "\n\nProcessing new TF\n-----------------";
+    LOG(info) << "\n\nProcessing new TF\n-----------------";
   }
   if (!mStartTFset) {
     mStartTF = mTF;
@@ -76,9 +76,9 @@ int ZDCDCSProcessor::process(const gsl::span<const DPCOM> dps)
   for (auto& it : mPids) {
     const auto& el = mapin.find(it.first);
     if (el == mapin.end()) {
-      LOG(DEBUG) << "DP " << it.first << " not found in map";
+      LOG(debug) << "DP " << it.first << " not found in map";
     } else {
-      LOG(DEBUG) << "DP " << it.first << " found in map";
+      LOG(debug) << "DP " << it.first << " found in map";
     }
   }
 
@@ -91,7 +91,7 @@ int ZDCDCSProcessor::process(const gsl::span<const DPCOM> dps)
     // we process only the DPs defined in the configuration
     const auto& el = mPids.find(it.id);
     if (el == mPids.end()) {
-      LOG(INFO) << "DP " << it.id << " not found in ZDCDCSProcessor, will not process it";
+      LOG(info) << "DP " << it.id << " not found in ZDCDCSProcessor, will not process it";
       continue;
     }
     processDP(it);
@@ -125,11 +125,11 @@ int ZDCDCSProcessor::processDP(const DPCOM& dpcom)
   auto& val = dpcom.data;
   if (mVerbose) {
     if (type == RAW_DOUBLE) { // positions, mapping and HV
-      LOG(INFO);
-      LOG(INFO) << "Processing DP " << dpcom << ", with value = " << o2::dcs::getValue<double>(dpcom);
+      LOG(info);
+      LOG(info) << "Processing DP " << dpcom << ", with value = " << o2::dcs::getValue<double>(dpcom);
     } else if (type == RAW_INT) { // mapping
-      LOG(INFO);
-      LOG(INFO) << "Processing DP " << dpcom << ", with value = " << o2::dcs::getValue<int32_t>(dpcom);
+      LOG(info);
+      LOG(info) << "Processing DP " << dpcom << ", with value = " << o2::dcs::getValue<int32_t>(dpcom);
     }
   }
   auto flags = val.get_flags();
@@ -138,7 +138,7 @@ int ZDCDCSProcessor::processDP(const DPCOM& dpcom)
     if (type == RAW_DOUBLE) { // full map & positions
       // for these DPs we store the first values
       /*auto& dvect = mDpsdoublesmap[dpid];
-      LOG(DEBUG) << "mDpsdoublesmap[dpid].size() = " << dvect.size();
+      LOG(debug) << "mDpsdoublesmap[dpid].size() = " << dvect.size();
       auto etime = val.get_epoch_time();
       if (dvect.size() == 0 ||
           etime != dvect.back().get_epoch_time()) { // check timestamp (TBF)
@@ -148,16 +148,16 @@ int ZDCDCSProcessor::processDP(const DPCOM& dpcom)
       if (std::strstr(dpid.get_alias(), "position") != nullptr) { // DP from POSITION
         std::bitset<4> posstatus(o2::dcs::getValue<double>(dpcom));
         if (mVerbose) {
-          LOG(INFO) << " Prev.positions : " << mPrevPositionstatus << ", new = " << posstatus;
+          LOG(info) << " Prev.positions : " << mPrevPositionstatus << ", new = " << posstatus;
         }
         if (posstatus == mPrevPositionstatus) {
           if (mVerbose) {
-            LOG(INFO) << "ZN/ZP positions unchanged, doing nothing";
+            LOG(info) << "ZN/ZP positions unchanged, doing nothing";
           }
           return 0;
         }
         if (mVerbose) {
-          LOG(INFO) << "Positions modified";
+          LOG(info) << "Positions modified";
         }
         mUpdateVerticalPosition = true;
         mPrevPositionstatus = posstatus;
@@ -184,16 +184,16 @@ int ZDCDCSProcessor::processDP(const DPCOM& dpcom)
         auto hvch = 5 * (detID - 1) + ich; // ZNA[0...4],ZPA[0...4],ZNC[0...4],ZPC[0...4],ZEM[1,2]
         std::bitset<NHVCHANNELS> hvstatus(o2::dcs::getValue<int32_t>(dpcom));
         if (mVerbose) {
-          LOG(INFO) << "HV ch. " << hvch << " Prev. value = " << mPrevHVstatus << ", New value = " << hvstatus;
+          LOG(info) << "HV ch. " << hvch << " Prev. value = " << mPrevHVstatus << ", New value = " << hvstatus;
         }
         if (hvstatus == mPrevHVstatus) {
           if (mVerbose) {
-            LOG(INFO) << "Same HV status as before, doing nothing";
+            LOG(info) << "Same HV status as before, doing nothing";
           }
           return 0;
         }
         if (mVerbose) {
-          LOG(INFO) << "Something changed in HV for ch. " << hvch;
+          LOG(info) << "Something changed in HV for ch. " << hvch;
         }
         mUpdateHVStatus = true;
         for (auto ich = 0; ich < NHVCHANNELS; ++ich) {
@@ -203,7 +203,7 @@ int ZDCDCSProcessor::processDP(const DPCOM& dpcom)
           }
         } // end loop on channels
         if (mVerbose) {
-          LOG(INFO) << "Updating previous HV status for ch. " << hvch;
+          LOG(info) << "Updating previous HV status for ch. " << hvch;
         }
         mPrevHVstatus = hvstatus;
       } // end processing current DP, when it is of type HVSTATUS
@@ -225,16 +225,16 @@ int ZDCDCSProcessor::processDP(const DPCOM& dpcom)
         auto idch = std::stoi(chStr);
         std::bitset<4> mapstatus(o2::dcs::getValue<int32_t>(dpcom));
         if (mVerbose) {
-          LOG(INFO) << "DDL: " << iddl << ": Prev = " << mPreviousMapping[iddl] << ", new = " << mapstatus;
+          LOG(info) << "DDL: " << iddl << ": Prev = " << mPreviousMapping[iddl] << ", new = " << mapstatus;
         }
         if (mapstatus == mPreviousMapping[iddl]) {
           if (mVerbose) {
-            LOG(INFO) << "Same mapping status as before, doing nothing";
+            LOG(info) << "Same mapping status as before, doing nothing";
           }
           return 0;
         }
         if (mVerbose) {
-          LOG(INFO) << "Mapping modified for DDL" << iddl;
+          LOG(info) << "Mapping modified for DDL" << iddl;
         }
         mUpdateMapping = true;
         for (auto imod = 0; imod < NMODULES; ++imod) { // one bit per module
@@ -247,14 +247,14 @@ int ZDCDCSProcessor::processDP(const DPCOM& dpcom)
               continue;
           }
           if (mVerbose) {
-            LOG(INFO) << "mZDCMapInfo[" << iddl << "][" << imod << "].moduleID[" << idch << "] = " << mZDCMapInfo[iddl][imod].channelValue[idch];
+            LOG(info) << "mZDCMapInfo[" << iddl << "][" << imod << "].moduleID[" << idch << "] = " << mZDCMapInfo[iddl][imod].channelValue[idch];
           }
           if (mMapping[idch] != singlechstatus) {
             mMapping[idch] = singlechstatus;
           }
         } // end loop on modules
         if (mVerbose) {
-          LOG(INFO) << "Updating previous mapping status for DDL " << iddl;
+          LOG(info) << "Updating previous mapping status for DDL " << iddl;
         }
         mPreviousMapping[iddl] = mapstatus;
       } // end processing current DP, when it is of type MAPPING
@@ -274,52 +274,52 @@ uint64_t ZDCDCSProcessor::processFlags(const uint64_t flags, const char* pid)
   // for now, I don't know how to use the flags, so I do nothing
 
   if (flags & DataPointValue::KEEP_ALIVE_FLAG) {
-    LOG(DEBUG) << "KEEP_ALIVE_FLAG active for DP " << pid;
+    LOG(debug) << "KEEP_ALIVE_FLAG active for DP " << pid;
   }
   if (flags & DataPointValue::END_FLAG) {
-    LOG(DEBUG) << "END_FLAG active for DP " << pid;
+    LOG(debug) << "END_FLAG active for DP " << pid;
   }
   if (flags & DataPointValue::FBI_FLAG) {
-    LOG(DEBUG) << "FBI_FLAG active for DP " << pid;
+    LOG(debug) << "FBI_FLAG active for DP " << pid;
   }
   if (flags & DataPointValue::NEW_FLAG) {
-    LOG(DEBUG) << "NEW_FLAG active for DP " << pid;
+    LOG(debug) << "NEW_FLAG active for DP " << pid;
   }
   if (flags & DataPointValue::DIRTY_FLAG) {
-    LOG(DEBUG) << "DIRTY_FLAG active for DP " << pid;
+    LOG(debug) << "DIRTY_FLAG active for DP " << pid;
   }
   if (flags & DataPointValue::TURN_FLAG) {
-    LOG(DEBUG) << "TURN_FLAG active for DP " << pid;
+    LOG(debug) << "TURN_FLAG active for DP " << pid;
   }
   if (flags & DataPointValue::WRITE_FLAG) {
-    LOG(DEBUG) << "WRITE_FLAG active for DP " << pid;
+    LOG(debug) << "WRITE_FLAG active for DP " << pid;
   }
   if (flags & DataPointValue::READ_FLAG) {
-    LOG(DEBUG) << "READ_FLAG active for DP " << pid;
+    LOG(debug) << "READ_FLAG active for DP " << pid;
   }
   if (flags & DataPointValue::OVERWRITE_FLAG) {
-    LOG(DEBUG) << "OVERWRITE_FLAG active for DP " << pid;
+    LOG(debug) << "OVERWRITE_FLAG active for DP " << pid;
   }
   if (flags & DataPointValue::VICTIM_FLAG) {
-    LOG(DEBUG) << "VICTIM_FLAG active for DP " << pid;
+    LOG(debug) << "VICTIM_FLAG active for DP " << pid;
   }
   if (flags & DataPointValue::DIM_ERROR_FLAG) {
-    LOG(DEBUG) << "DIM_ERROR_FLAG active for DP " << pid;
+    LOG(debug) << "DIM_ERROR_FLAG active for DP " << pid;
   }
   if (flags & DataPointValue::BAD_DPID_FLAG) {
-    LOG(DEBUG) << "BAD_DPID_FLAG active for DP " << pid;
+    LOG(debug) << "BAD_DPID_FLAG active for DP " << pid;
   }
   if (flags & DataPointValue::BAD_FLAGS_FLAG) {
-    LOG(DEBUG) << "BAD_FLAGS_FLAG active for DP " << pid;
+    LOG(debug) << "BAD_FLAGS_FLAG active for DP " << pid;
   }
   if (flags & DataPointValue::BAD_TIMESTAMP_FLAG) {
-    LOG(DEBUG) << "BAD_TIMESTAMP_FLAG active for DP " << pid;
+    LOG(debug) << "BAD_TIMESTAMP_FLAG active for DP " << pid;
   }
   if (flags & DataPointValue::BAD_PAYLOAD_FLAG) {
-    LOG(DEBUG) << "BAD_PAYLOAD_FLAG active for DP " << pid;
+    LOG(debug) << "BAD_PAYLOAD_FLAG active for DP " << pid;
   }
   if (flags & DataPointValue::BAD_FBI_FLAG) {
-    LOG(DEBUG) << "BAD_FBI_FLAG active for DP " << pid;
+    LOG(debug) << "BAD_FBI_FLAG active for DP " << pid;
   }
 
   return 0;
@@ -330,7 +330,7 @@ uint64_t ZDCDCSProcessor::processFlags(const uint64_t flags, const char* pid)
 void ZDCDCSProcessor::updateDPsCCDB()
 {
   // here we create the object to then be sent to CCDB
-  LOG(INFO) << "Updating DCS map";
+  LOG(info) << "Updating DCS map";
 
   std::map<std::string, std::string> md;
   md["responsible"] = "Chiara Oppedisano";
@@ -347,7 +347,7 @@ void ZDCDCSProcessor::updateMappingCCDB()
   // we need to update a CCDB for the FEAC status --> let's prepare the CCDBInfo
 
   if (mVerbose) {
-    LOG(INFO) << "Mapping changed --> I will update CCDB";
+    LOG(info) << "Mapping changed --> I will update CCDB";
   }
   std::map<std::string, std::string> md;
   md["responsible"] = "Chiara Oppedisano";
@@ -363,7 +363,7 @@ void ZDCDCSProcessor::updateHVCCDB()
   // we need to update a CCDB for the HV status --> let's prepare the CCDBInfo
 
   if (mVerbose) {
-    LOG(INFO) << "At least one HV changed status --> I will update CCDB";
+    LOG(info) << "At least one HV changed status --> I will update CCDB";
   }
   std::map<std::string, std::string> md;
   md["responsible"] = "Chiara Oppedisano";
@@ -379,7 +379,7 @@ void ZDCDCSProcessor::updatePositionCCDB()
   // we need to update a CCDB for the table position --> let's prepare the CCDBInfo
 
   if (mVerbose) {
-    LOG(INFO) << "ZDC vertical positions changed --> I will update CCDB";
+    LOG(info) << "ZDC vertical positions changed --> I will update CCDB";
   }
   std::map<std::string, std::string> md;
   md["responsible"] = "Chiara Oppedisano";
@@ -402,6 +402,6 @@ void ZDCDCSProcessor::getZDCActiveChannels(int nDDL, int nModule, ZDCModuleMap& 
   }
 
   // if (mVerbose) {
-  LOG(INFO) << "nDDL: " << nDDL << " -> Module " << nModule << " has " << nActiveChannels << " active channels";
+  LOG(info) << "nDDL: " << nDDL << " -> Module " << nModule << " has " << nActiveChannels << " active channels";
   //}
 }

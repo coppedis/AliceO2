@@ -46,7 +46,7 @@ class TFDispatcher : public o2::framework::Task
     for (auto& input : pc.inputs()) {
       auto tfid = header::get<o2::framework::DataProcessingHeader*>(input.header)->startTime;
       if (tfid >= mMaxTF - 1) {
-        LOG(INFO) << "Data generator reached TF " << tfid << ", stopping";
+        LOG(info) << "Data generator reached TF " << tfid << ", stopping";
         pc.services().get<o2::framework::ControlService>().endOfStream();
         pc.services().get<o2::framework::ControlService>().readyToQuit(o2::framework::QuitRequest::Me);
         if (!acceptTF(tfid)) {
@@ -70,10 +70,10 @@ class TFDispatcher : public o2::framework::Task
 
     int targetSlot = (tfid / mNLanes) % mNGen;
     if (targetSlot != mSlot) {
-      LOG(INFO) << "tfid = " << tfid << ", mNLanes = " << mNLanes << ", mNGen = " << mNGen << ", mSlot = " << mSlot << " target slot = " << targetSlot << ": discarded";
+      LOG(info) << "tfid = " << tfid << ", mNLanes = " << mNLanes << ", mNGen = " << mNGen << ", mSlot = " << mSlot << " target slot = " << targetSlot << ": discarded";
       return false;
     }
-    LOG(INFO) << "tfid = " << tfid << ", mNLanes = " << mNLanes << ", mNGen = " << mNGen << ", mSlot = " << mSlot << " target slot = " << targetSlot << ": accepted";
+    LOG(info) << "tfid = " << tfid << ", mNLanes = " << mNLanes << ", mNGen = " << mNGen << ", mSlot = " << mSlot << " target slot = " << targetSlot << ": accepted";
     return true;
   }
 
@@ -96,7 +96,7 @@ class TFProcessor : public o2::framework::Task
     gRandom->SetSeed(mDevCopy);
     mZDCChannelCalib = ic.options().get<bool>("do-ZDC-channel-calib");
     mZDCChannelCalibInTestMode = ic.options().get<bool>("do-ZDC-channel-calib-in-test-mode");
-    LOG(INFO) << "TFProcessorCopy: " << mDevCopy << " MeanLatency: " << mMeanLatency << " LatencyRMS: " << mLatencyRMS << " DoZDCChannelCalib: " << mZDCChannelCalib
+    LOG(info) << "TFProcessorCopy: " << mDevCopy << " MeanLatency: " << mMeanLatency << " LatencyRMS: " << mLatencyRMS << " DoZDCChannelCalib: " << mZDCChannelCalib
               << " DoZDCChannelCalibInTestMode: " << mZDCChannelCalibInTestMode;
   }
 
@@ -105,7 +105,7 @@ class TFProcessor : public o2::framework::Task
     auto tfcounter = o2::header::get<o2::framework::DataProcessingHeader*>(pc.inputs().get("input").header)->startTime;
     // introduceDelay
     uint32_t delay = std::abs(gRandom->Gaus(mMeanLatency, mLatencyRMS));
-    LOG(INFO) << "TFProcessorCopy: " << mDevCopy << " Simulate latency of " << delay << " mcs for TF " << tfcounter;
+    LOG(info) << "TFProcessorCopy: " << mDevCopy << " Simulate latency of " << delay << " mcs for TF " << tfcounter;
     usleep(delay);
 
     // push dummy output
