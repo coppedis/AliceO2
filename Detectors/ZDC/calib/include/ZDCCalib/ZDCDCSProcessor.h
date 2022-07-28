@@ -66,7 +66,6 @@ struct ZDCModuleMap {
   std::array<bool, 4> readChannel = {false, false, false, false};
   std::array<bool, 4> triggerChannel = {false, false, false, false};
   std::array<int, 4> channelValue = {-1, -1, -1, -1};
-  // std::array<TriggerChannelConfig, 4> trigChannelConf;
 };
 
 /*struct TriggerChannelConfig {

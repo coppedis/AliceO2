@@ -209,7 +209,6 @@ int ZDCDCSProcessor::processDP(const DPCOM& dpcom)
         mPrevHVstatus = hvstatus;
       } // end processing current DP, when it is of type HVSTATUS
     }
-
     if (type == RAW_INT) { // mapping
       // DP  processing
       if (std::strstr(dpid.get_alias(), "CONFIG") != nullptr) { // DP from CONFIG (ie mapping)

@@ -85,7 +85,7 @@ class ZDCDCSConfigProcessor : public o2::framework::Task
   //________________________________________________________________
 
   bool mVerbose = false; // to enable verbose mode
-};                       // end class
+}; // end class
 } // namespace zdc
 
 namespace framework
