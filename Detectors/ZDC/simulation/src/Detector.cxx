@@ -2293,7 +2293,7 @@ void Detector::createDetectors()
   double zemSupport2[3] = {2. / 2, 5. / 2., 95. / 2.};              // support table heels (piedini)
   double zemSupport3[3] = {3.5, 2. / 2., zemLength};                // screens around ZEM
   double zemSupport4[6] = {20. / 2., 3.5, 1.5 / 2., 45., 0., 0.};   // detector box walls (side)
-  double zemWallH[3] = {10.5 / 2., /*bthickness[1]*/ 1., 95. / 2.};    // box walls
+  double zemWallH[3] = {10.5 / 2., /*bthickness[1]*/ 1., 95. / 2.}; // box walls
   double zemWallVfwd[3] = {10.5 / 2., (100. - 2.) / 2., 0.2};
   double zemWallVbkw[3] = {10.5 / 2., (100. - 2.) / 2., 2. / 2.};
   double zemWallVside[3] = {0.25 / 2., (100. - 2.) / 2., (95. - 2.) / 2.};
